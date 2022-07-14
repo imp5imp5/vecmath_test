@@ -1,0 +1,13 @@
+# This is a basic workflow that is manually triggered
+
+name: Hit a webhook
+
+on: push
+    
+jobs:
+  run-updater:
+    runs-on: ubuntu-latest
+    steps:
+    - name: REST API with curl
+      run: |
+        curl -X GET "http://vds2297075.my-ihor.ru:20202/cgi/update_version_action.py"
