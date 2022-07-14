@@ -223,6 +223,20 @@ void profile(int n)
   vv = v_add(vv, b);
   PROFILE_END()
 
+  PROFILE_BEGIN("1/x")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
+  b = a;
+  float xx = 1.56f;
+
+  for (int i = 0; i < n; i++)
+  {
+    xx = 1.f / xx + xx * 1e-20f;
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
 }
 
 
