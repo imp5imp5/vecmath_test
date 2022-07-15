@@ -756,9 +756,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = 1.f / xx + xx * 1e-20f;
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
@@ -771,9 +773,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = fastinvsqrt(xx);
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
@@ -786,9 +790,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = fastinv(xx) + xx * 1e-20f;
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
@@ -801,9 +807,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = fastsqrt(xx);
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
@@ -816,9 +824,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = invsqrt(xx);
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
@@ -831,9 +841,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = sqrtf(xx);
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
@@ -849,6 +861,7 @@ void profile(int n)
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
   vv = v_add(vv, b);
+  vv = v_add(vv, b);
   PROFILE_END()
 
   PROFILE_BEGIN("v_exp2")
@@ -863,6 +876,7 @@ void profile(int n)
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
   vv = v_add(vv, b);
+  vv = v_add(vv, b);
   PROFILE_END()
 
   PROFILE_BEGIN("expf")
@@ -874,9 +888,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = expf(xx) + 1e-3;
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
@@ -889,9 +905,11 @@ void profile(int n)
 
   for (int i = 0; i < n; i++)
   {
+    b = v_rot_1(b);
     xx = exp2f(xx) + 1e-3;
   }
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
