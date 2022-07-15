@@ -798,7 +798,7 @@ void profile(int n)
   vec4f b;
   SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
   b = a;
-  float xx = 1.56f;
+  float xx = 1000.56f;
 
   for (int i = 0; i < n; i++)
   {
@@ -828,7 +828,7 @@ void profile(int n)
   vec4f b;
   SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
   b = a;
-  float xx = 1.56f;
+  float xx = 1000.56f;
 
   for (int i = 0; i < n; i++)
   {
@@ -837,6 +837,66 @@ void profile(int n)
  // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
+
+  PROFILE_BEGIN("v_exp")
+  vec4f a;
+  vec4f b;
+  SET4(a, -1.00000, -1.00002, -0.99999, -0.99998);
+  b = a;
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    b = v_exp(b);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  PROFILE_END()
+
+  PROFILE_BEGIN("v_exp2")
+  vec4f a;
+  vec4f b;
+  SET4(a, -1.00000, -1.00002, -0.99999, -0.99998);
+  b = a;
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    b = v_exp2(b);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  PROFILE_END()
+
+  PROFILE_BEGIN("expf")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
+  b = a;
+  float xx = -1e-6f;
+
+  for (int i = 0; i < n; i++)
+  {
+    xx = expf(xx) + 1e-3;
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
+
+  PROFILE_BEGIN("exp2f")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
+  b = a;
+  float xx = -1e-6f;
+
+  for (int i = 0; i < n; i++)
+  {
+    xx = exp2f(xx) + 1e-3;
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
+
+
 }
 
 
@@ -863,8 +923,8 @@ void base_test()
   float neg_inf = -pos_inf;
   float nan = cos(pos_inf);
 
-  TEST(sizeof(a) == sizeof(iv));
-  TEST(sizeof(a) == sizeof(fv));
+  TEST(sizeof(a) == sizeof(iv), "");
+  TEST(sizeof(a) == sizeof(fv), "");
 
   a = v_zero();
   iv.set(0, 0, 0, 0);
