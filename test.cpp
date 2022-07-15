@@ -31,7 +31,6 @@ template <typename T> INLINE T min(T a, T b)
 
 template <typename T> INLINE T clamp(T t, const T min_val, const T max_val)
 {
-  DisablePointersInMath<T>();
   if (t < min_val)
     t = min_val;
   if (t <= max_val)
