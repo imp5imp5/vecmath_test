@@ -51,8 +51,8 @@ INLINE void sincos(float rad, float &s, float &c)
 #if defined(_GNU_SOURCE)
   sincosf(rad, &s, &c);
 #else
-  s = sin(rad);
-  c = cos(rad);
+  s = sinf(rad);
+  c = cosf(rad);
 #endif
 }
 
@@ -191,8 +191,8 @@ bool float_rel_eq(float a, float b, float rel_threshold)
   if (fabs(a - b) < 1e-18f)
     return true;
 
-  float mx = max(fabs(a), fabs(b));
-  float mn = min(fabs(a), fabs(b));
+  float mx = max(fabsf(a), fabsf(b));
+  float mn = min(fabsf(a), fabsf(b));
 
   float t = mx * rel_threshold;
   return (fabs(a - b) < t);
@@ -224,7 +224,7 @@ bool float_rel_eq(float a, float b, float rel_threshold)
 #define TEST_THR(func, x, expect, threshold) \
   { \
     float v = func(cf(x)); \
-    bool ok = float_rel_eq(v, expect, threshold); \
+    bool ok = float_rel_eq(v, float(expect), float(threshold)); \
     if (!ok) \
     { \
       printf("\n%s(%g) = %g,  expected %g\n", #func, cf(x), v, expect); \
@@ -568,9 +568,9 @@ void advanced_test()
   TestFloatVec fv;
   TestFloatVec fv2;
   vec4f a, b;
-  float pos_inf = exp(1e20f);
+  float pos_inf = expf(1e20f);
   float neg_inf = -pos_inf;
-  float nan = cos(pos_inf);
+  float nan = expf(-1e30f) / expf(-1e32f);
 
   fv.set(-0.0f, -1e-30f, 1e-30f, (1 << 23));
   fv2.set(0, 0, 1, (1 << 23));
@@ -581,8 +581,8 @@ void advanced_test()
 
 
 #define A(x, n)   ((float*)&x)[n]
-#define SET3(x, v0, v1, v2) {A(x,0)=v0; A(x,1)=v1; A(x,2)=v2;}
-#define SET4(x, v0, v1, v2, v3) {A(x,0)=v0; A(x,1)=v1; A(x,2)=v2; A(x,3)=v3;}
+#define SET3(x, v0, v1, v2) {A(x,0)=float(v0); A(x,1)=float(v1); A(x,2)=float(v2);}
+#define SET4(x, v0, v1, v2, v3) {A(x,0)=float(v0); A(x,1)=float(v1); A(x,2)=float(v2); A(x,3)=float(v3);}
 
 #define PROFILE_BEGIN(name_) \
 { \
@@ -592,7 +592,7 @@ void advanced_test()
 
 #define PROFILE_END() \
   auto t1 = std::chrono::steady_clock::now(); \
-  int tt = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count(); \
+  int tt = int(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()); \
   if (baseline == 0) \
     baseline = tt; \
   else \
@@ -611,7 +611,7 @@ void profile(int n)
   TestFloatVec tt;
 
   vec4f t;
-  SET4(t, 1e-4, -1e-3, -1e-6, 1e-4);
+  SET4(t, 1e-4f, -1e-3f, -1e-6f, 1e-4f);
 
   PROFILE_BEGIN("warm-up")
   float s = 0;
@@ -625,7 +625,7 @@ void profile(int n)
   PROFILE_BEGIN("baseline")
   vec4f a;
   vec4f b;
-  SET4(a, 1.01, 2.01, -21.01, 0.53f);
+  SET4(a, 1.01f, 2.01f, -21.01f, 0.53f);
   b = a;
   for (int i = 0; i < n; i++)
   {
@@ -638,7 +638,7 @@ void profile(int n)
   PROFILE_BEGIN("v_add")
   vec4f a;
   vec4f b;
-  SET4(a, 1.001, -1.002, 0.999, -0.998);
+  SET4(a, 1.001f, -1.002f, 0.999f, -0.998f);
   b = a;
   for (int i = 0; i < n; i++)
   {
@@ -652,7 +652,7 @@ void profile(int n)
   PROFILE_BEGIN("v_mul")
   vec4f a;
   vec4f b;
-  SET4(a, 1.001, -1.002, 0.999, -0.998);
+  SET4(a, 1.001f, -1.002f, 0.999f, -0.998f);
   b = a;
   for (int i = 0; i < n; i++)
   {
@@ -666,7 +666,7 @@ void profile(int n)
   PROFILE_BEGIN("v_rcp")
   vec4f a;
   vec4f b;
-  SET4(a, 1.001, -1.002, 0.999, -0.998);
+  SET4(a, 1.001f, -1.002f, 0.999f, -0.998f);
   b = a;
   for (int i = 0; i < n; i++)
   {
@@ -680,7 +680,7 @@ void profile(int n)
   PROFILE_BEGIN("v_rcp_x")
   vec4f a;
   vec4f b;
-  SET4(a, 1.001, -1.002, 0.999, -0.998);
+  SET4(a, 1.001f, -1.002f, 0.999f, -0.998f);
   b = a;
   for (int i = 0; i < n; i++)
   {
@@ -694,7 +694,7 @@ void profile(int n)
   PROFILE_BEGIN("v_rcp_est")
   vec4f a;
   vec4f b;
-  SET4(a, 1.001, -1.002, 0.999, -0.998);
+  SET4(a, 1.001f, -1.002f, 0.999f, -0.998f);
   b = a;
   for (int i = 0; i < n; i++)
   {
@@ -708,7 +708,7 @@ void profile(int n)
   PROFILE_BEGIN("v_rcp_est_x")
   vec4f a;
   vec4f b;
-  SET4(a, 1.001, -1.002, 0.999, -0.998);
+  SET4(a, 1.001f, -1.002f, 0.999f, -0.998f);
   b = a;
   for (int i = 0; i < n; i++)
   {
@@ -918,9 +918,9 @@ void base_test()
   TestFloatVec fv;
   TestFloatVec fv2;
   vec4f a, b;
-  float pos_inf = exp(1e20f);
+  float pos_inf = expf(1e20f);
   float neg_inf = -pos_inf;
-  float nan = cos(pos_inf);
+  float nan = cosf(pos_inf);
 
   TEST(sizeof(a) == sizeof(iv), "");
   TEST(sizeof(a) == sizeof(fv), "");
@@ -1055,10 +1055,10 @@ void base_test()
     plane3f p1;
     A(p1, 0) = 0;
     A(p1, 1) = 1;
-    A(p1, 2) = 1e-15;
+    A(p1, 2) = 1e-15f;
     A(p1, 3) = 2;
     plane3f p2;
-    A(p2, 0) = 1e-15;
+    A(p2, 0) = 1e-15f;
     A(p2, 1) = 1;
     A(p2, 2) = 0;
     A(p2, 3) = 3;
@@ -1072,9 +1072,9 @@ void base_test()
     A(start, 1) = -0.5f;
     A(start, 2) = 0;
     vec3f dir;
-    A(dir, 0) = -1e-38;
+    A(dir, 0) = -1e-38f;
     A(dir, 1) = 1;
-    A(dir, 2) = 1e-38;
+    A(dir, 2) = 1e-38f;
 
     bbox3f box;
     A(box.bmax, 0) = 1;
