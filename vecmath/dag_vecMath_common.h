@@ -202,18 +202,25 @@ VECMATH_FINLINE void VECTORCALL v_mat44_transpose_to_mat33(mat33f &dest, vec3f c
 }
 #endif
 
+VECMATH_FINLINE vec4f VECTORCALL v_remove_not_finite(vec4f a)
+{
+  static vec4i_const infMask = { 0x7F800000, 0x7F800000, 0x7F800000, 0x7F800000 };
+  vec4i ai = v_cast_vec4i(a);
+  return v_cast_vec4f(v_andnoti(v_cmp_eqi(v_andi(ai, infMask), infMask), ai));
+}
+
 #if defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__ > 0 // Clang/GCC
 VECMATH_FINLINE vec4f VECTORCALL v_remove_nan(vec4f a)
 {
-  static vec4i_const nanMask = { 0x7FC00000, 0x7FC00000, 0x7FC00000, 0x7FC00000 };
-  vec4i ai = v_cast_vec4i(a);
-  return v_cast_vec4f(v_andi(ai, v_cmp_lti(v_andi(ai, nanMask), nanMask)));
+  static vec4i_const minNan = { 0x7F800001, 0x7F800001, 0x7F800001, 0x7F800001 };
+  vec4i am = v_andi(v_cast_vec4i(a), V_CI_INV_SIGN_MASK);
+  return v_cast_vec4f(v_andi(v_cast_vec4i(a), v_cmp_lti(am, minNan)));
 }
 #else
 VECMATH_FINLINE vec4f VECTORCALL v_remove_nan(vec4f a) {return v_and(a, v_cmp_eq(a,a)); }
 #endif
-VECMATH_FINLINE vec4f VECTORCALL v_norm4_safe(vec4f a) {return v_remove_nan(v_norm4(a));}
-VECMATH_FINLINE vec4f VECTORCALL v_norm3_safe(vec4f a) {return v_remove_nan(v_norm3(a));}
+VECMATH_FINLINE vec4f VECTORCALL v_norm4_safe(vec4f a) {return v_remove_not_finite(v_norm4(a));}
+VECMATH_FINLINE vec4f VECTORCALL v_norm3_safe(vec4f a) {return v_remove_not_finite(v_norm3(a));}
 
 VECMATH_FINLINE void VECTORCALL v_mat33_transpose(mat33f &dest, mat33f_cref src)
 {

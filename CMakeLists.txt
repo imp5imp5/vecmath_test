@@ -8,7 +8,7 @@ if (MSVC)
     add_compile_options(/O2)
 else()
     add_compile_options(-O2)
+    target_link_libraries(vecmath_test m)
 endif()
 
 target_include_directories(vecmath_test PUBLIC .)
-target_link_libraries(vecmath_test m)
