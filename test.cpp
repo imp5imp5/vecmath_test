@@ -7,6 +7,7 @@
 #include <chrono>
 #include <stdio.h>
 #include <stdint.h>
+#include <float.h>
 
 #if defined(DAGOR_DBGLEVEL)
 #define DAGOR_MATH 1
