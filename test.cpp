@@ -605,6 +605,248 @@ float vs = 0.0;
 vec4f vv;
 
 
+
+
+
+
+
+inline float m_max(float a, float b)
+{
+  return a > b ? a : b;
+}
+
+inline float m_min(float a, float b)
+{
+  return a < b ? a : b;
+}
+
+inline float m_sub(float a, float b)
+{
+  return a - b;
+}
+
+inline int m_cvt_roundi(float a)
+{
+  return int(round(a));
+}
+
+inline float m_cvt_vec4f(int i)
+{
+  return float(i);
+}
+
+inline int m_splatsi(int i)
+{
+  return i;
+}
+
+inline float m_splats(float f)
+{
+  return f;
+}
+
+inline int m_addi(int a, int b)
+{
+  return a + b;
+}
+
+inline float m_add(float a, float b)
+{
+  return a + b;
+}
+
+inline float m_mul(float a, float b)
+{
+  return a * b;
+}
+
+inline int m_slli(int a, int b)
+{
+  return a << b;
+}
+
+inline float m_cast_vec4f(int a)
+{
+  float f;
+  memcpy(&f, &a, 4);
+  return f;
+}
+
+
+#define MPOLY0(x, c0) m_splats(c0)
+#define MPOLY1(x, c0, c1) m_add(m_mul(MPOLY0(x, c1), x), m_splats(c0))
+#define MPOLY2(x, c0, c1, c2) m_add(m_mul(MPOLY1(x, c1, c2), x), m_splats(c0))
+#define MPOLY3(x, c0, c1, c2, c3) m_add(m_mul(MPOLY2(x, c1, c2, c3), x), m_splats(c0))
+#define MPOLY4(x, c0, c1, c2, c3, c4) m_add(m_mul(MPOLY3(x, c1, c2, c3, c4), x), m_splats(c0))
+#define MPOLY5(x, c0, c1, c2, c3, c4, c5) m_add(m_mul(MPOLY4(x, c1, c2, c3, c4, c5), x), m_splats(c0))
+
+VECMATH_INLINE float VECTORCALL m_exp2(float x)
+{
+  int ipart;
+  float fpart, expipart, expfpart;
+  x = m_min(x,  129.00000f);
+  x = m_max(x, -126.99999f);
+  ipart = m_cvt_roundi(m_sub(x, 0.5f - FLT_EPSILON * 32));
+  fpart = m_sub(x, m_cvt_vec4f(ipart));
+  expipart = m_cast_vec4f(m_slli(m_addi(ipart, m_splatsi(127)), 23));
+  expfpart = MPOLY5(fpart, 9.9999994e-1f, 6.9315308e-1f, 2.4015361e-1f, 5.5826318e-2f, 8.9893397e-3f, 1.8775767e-3f);
+  return fpart == 0.0f ? expipart : m_mul(expipart, expfpart);
+}
+
+
+
+
+
+struct avec
+{
+  float x, y, z, w;
+};
+
+struct aivec
+{
+  int x, y, z, w;
+};
+
+inline avec a_max(avec a, avec b)
+{
+  return avec{
+      a.x > b.x ? a.x : b.x,
+      a.y > b.y ? a.y : b.y,
+      a.z > b.z ? a.z : b.z,
+      a.w > b.w ? a.w : b.w
+  };
+}
+
+inline avec a_min(avec a, avec b)
+{
+  return avec{
+    a.x < b.x ? a.x : b.x,
+    a.y < b.y ? a.y : b.y,
+    a.z < b.z ? a.z : b.z,
+    a.w < b.w ? a.w : b.w
+  };
+}
+
+inline avec a_sub(avec a, avec b)
+{
+  return avec{
+    a.x - b.x,
+    a.y - b.y,
+    a.z - b.z,
+    a.w - b.w
+  };
+}
+
+inline aivec a_cvt_roundi(avec a)
+{
+  return aivec{
+    int(round(a.x)),
+    int(round(a.y)),
+    int(round(a.z)),
+    int(round(a.w))
+  };
+}
+
+inline avec a_cvt_vec4f(aivec i)
+{
+  return avec{
+    float(i.x),
+    float(i.y),
+    float(i.z),
+    float(i.w)
+  };
+}
+
+inline aivec a_splatsi(int i)
+{
+  return aivec{i, i, i, i};
+}
+
+inline avec a_splats(float f)
+{
+  return avec{f, f, f, f};
+}
+
+inline aivec a_addi(aivec a, aivec b)
+{
+  return aivec{
+    a.x + b.x,
+    a.y + b.y,
+    a.z + b.z,
+    a.w + b.w
+  };
+}
+
+inline avec a_add(avec a, avec b)
+{
+  return avec{
+    a.x + b.x,
+    a.y + b.y,
+    a.z + b.z,
+    a.w + b.w
+  };
+}
+
+inline avec a_mul(avec a, avec b)
+{
+  return avec{
+    a.x * b.x,
+    a.y * b.y,
+    a.z * b.z,
+    a.w * b.w
+  };
+}
+
+inline aivec a_slli(aivec a, int b)
+{
+  return aivec{
+    a.x << b,
+    a.y << b,
+    a.z << b,
+    a.w << b
+  };
+}
+
+inline avec a_cast_vec4f(aivec a)
+{
+  avec f;
+  memcpy(&f, &a, 4 * 4);
+  return f;
+}
+
+inline avec a_test(avec t, avec if_true, avec if_false)
+{
+  return avec{
+    t.x == 0.0f ? if_true.x : if_false.x,
+    t.y == 0.0f ? if_true.y : if_false.y,
+    t.z == 0.0f ? if_true.z : if_false.z,
+    t.w == 0.0f ? if_true.w : if_false.w,
+  };
+}
+
+#define APOLY0(x, c0) a_splats(c0)
+#define APOLY1(x, c0, c1) a_add(a_mul(APOLY0(x, c1), x), a_splats(c0))
+#define APOLY2(x, c0, c1, c2) a_add(a_mul(APOLY1(x, c1, c2), x), a_splats(c0))
+#define APOLY3(x, c0, c1, c2, c3) a_add(a_mul(APOLY2(x, c1, c2, c3), x), a_splats(c0))
+#define APOLY4(x, c0, c1, c2, c3, c4) a_add(a_mul(APOLY3(x, c1, c2, c3, c4), x), a_splats(c0))
+#define APOLY5(x, c0, c1, c2, c3, c4, c5) a_add(a_mul(APOLY4(x, c1, c2, c3, c4, c5), x), a_splats(c0))
+
+VECMATH_INLINE avec VECTORCALL a_exp2(avec x)
+{
+  aivec ipart;
+  avec fpart, expipart, expfpart;
+  x = a_min(x, a_splats( 129.00000f));
+  x = a_max(x, a_splats(-126.99999f));
+  ipart = a_cvt_roundi(a_sub(x, a_splats(0.5f - FLT_EPSILON * 32)));
+  fpart = a_sub(x, a_cvt_vec4f(ipart));
+  expipart = a_cast_vec4f(a_slli(a_addi(ipart, a_splatsi(127)), 23));
+  expfpart = APOLY5(fpart, 9.9999994e-1f, 6.9315308e-1f, 2.4015361e-1f, 5.5826318e-2f, 8.9893397e-3f, 1.8775767e-3f);
+  return a_test(fpart, expipart, a_mul(expipart, expfpart));
+}
+
+
+
+
 void profile(int n)
 {
   int baseline = 0;
@@ -913,6 +1155,39 @@ void profile(int n)
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
+
+  PROFILE_BEGIN("m_exp2")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.0000, 1.0000, 0.99999, 1.0);
+  b = a;
+  float xx = 0.999999f;
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    xx = m_exp2(xx);
+  }
+  vv = v_add(vv, b);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
+
+
+  PROFILE_BEGIN("a_exp2")
+  vec4f a;
+  vec4f b;
+  SET4(a, 0.99999f, 0.99339f, 0.99399f, 0.99999f);
+  b = a;
+  avec av;
+  memcpy(&av, &a, sizeof(a));
+  float xx = 0.999999f;
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    av = a_exp2(av);
+  }
+  vv = v_add(vv, b);
+  vv = v_add(vv, v_splats(av.x + av.y + av.z + av.w));
+  PROFILE_END()
 
 }
 
