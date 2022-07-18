@@ -7,7 +7,7 @@ add_executable(vecmath_test ${SRC})
 if (MSVC)
     add_compile_options(/O2)
 else()
-    add_compile_options(-O2)
+    add_compile_options(-O2 -std=c++17)
     target_link_libraries(vecmath_test m)
 endif()
 
