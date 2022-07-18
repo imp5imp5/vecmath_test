@@ -57,9 +57,21 @@ INLINE void sincos(float rad, float &s, float &c)
 #endif
 }
 
-
 #endif
 
+
+float Q_rsqrt(float number)
+{
+	union
+  {
+		float    f;
+		uint32_t i;
+	} conv;
+  conv.f = number;
+	conv.i  = 0x5f3759df - (conv.i >> 1);
+	conv.f *= 1.5F - (number * 0.5F * conv.f * conv.f);
+	return conv.f;
+}
 
 
 
@@ -1075,6 +1087,40 @@ void profile(int n)
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
 
+  PROFILE_BEGIN("Q_rsqrt")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
+  b = a;
+  float xx = 1.56f;
+
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    xx = Q_rsqrt(xx);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
+
+  PROFILE_BEGIN("1.f/sqrtf")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
+  b = a;
+  float xx = 1.56f;
+
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    xx = 1.f/sqrtf(xx);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
+
   PROFILE_BEGIN("sqrtf")
   vec4f a;
   vec4f b;
@@ -1091,6 +1137,75 @@ void profile(int n)
   vv = v_add(vv, b);
   vv = v_add(vv, v_splats(xx));
   PROFILE_END()
+
+
+  PROFILE_BEGIN("floorf")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
+  b = a;
+  float xx = 1000.56f;
+
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    xx = floorf(xx);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
+
+
+  PROFILE_BEGIN("v_floor")
+  vec4f a;
+  vec4f b;
+  SET4(a, -1.00000, -1.00002, -0.99999, -0.99998);
+  b = a;
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    b = v_floor(b);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  vv = v_add(vv, b);
+  PROFILE_END()
+
+
+  PROFILE_BEGIN("roundf")
+  vec4f a;
+  vec4f b;
+  SET4(a, 1.00001, -1.00002, 0.99999, -0.99998);
+  b = a;
+  float xx = 1000.56f;
+
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    xx = floorf(xx);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  vv = v_add(vv, v_splats(xx));
+  PROFILE_END()
+
+
+  PROFILE_BEGIN("v_round")
+  vec4f a;
+  vec4f b;
+  SET4(a, -1.00000, -1.00002, -0.99999, -0.99998);
+  b = a;
+  for (int i = 0; i < n; i++)
+  {
+    b = v_rot_1(b);
+    b = v_floor(b);
+  }
+ // printf("%g %g %g %g\n", ((float*)(&b))[0], ((float*)(&b))[1], ((float*)(&b))[2], ((float*)(&b))[3]);
+  vv = v_add(vv, b);
+  vv = v_add(vv, b);
+  PROFILE_END()
+
 
   PROFILE_BEGIN("v_exp")
   vec4f a;
